@@ -13,16 +13,16 @@
       content="Anmol Singh, Data Science, AI Engineer, Portfolio, Web Development, Python, C++, React"
     />
     <meta name="author" content="Anmol Singh" />
-    <link rel="canonical" href="https://your-portfolio-url.app/" />
+    <link rel="canonical" href="https://anmolsingh.com" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://your-portfolio-url.app/" />
+    <meta property="og:url" content="https://anmolsingh.com" />
     <meta property="og:title" content="ANMOL | Data Science & AI" />
     <meta
       property="og:description"
       content="B.Tech Data Science Student passionate about building intelligent systems."
     />
-    <meta property="og:image" content="Assets/images/og-image.png" />
+    <meta property="og:image" content="img.jpg" />
 
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:title" content="ANMOL | Data Science & AI" />
@@ -107,10 +107,47 @@
         z-index: 9999;
         mix-blend-mode: difference;
         transition:
-          width 0.2s,
-          height 0.2s,
-          background-color 0.2s,
-          transform 0.1s;
+          width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+          height 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+          background-color 0.3s ease,
+          transform 0.1s ease;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+        filter: invert(1);
+      }
+
+      #cursor.active {
+        animation: cursorPulse 0.6s ease-out;
+      }
+
+      @keyframes cursorPulse {
+        0% {
+          transform: translate(-50%, -50%) scale(1);
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(1.2);
+          box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+        }
+      }
+
+      #cursor::before {
+        content: "";
+        position: absolute;
+        inset: -8px;
+        border: 2px solid rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        animation: cursorRing 2s linear infinite;
+      }
+
+      @keyframes cursorRing {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1.4);
+          opacity: 0;
+        }
       }
 
       /* Animations */
@@ -126,6 +163,7 @@
 
       .marquee-container:hover .marquee-content {
         animation-play-state: paused;
+        filter: brightness(1.1) drop-shadow(0 0 10px rgba(51, 255, 87, 0.5));
       }
 
       @keyframes scroll {
@@ -137,16 +175,38 @@
         }
       }
 
+      .marquee-content span {
+        padding: 0 40px;
+        font-weight: 900;
+        letter-spacing: 2px;
+        text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
+      }
+
       /* Reveal Animation */
       .reveal {
         opacity: 0;
         transform: translateY(40px);
-        transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
       }
 
       .reveal.active {
         opacity: 1;
         transform: translateY(0);
+        animation: revealGlow 0.8s ease-out;
+      }
+
+      @keyframes revealGlow {
+        0% {
+          filter: blur(10px);
+          opacity: 0;
+        }
+        50% {
+          filter: blur(5px);
+        }
+        100% {
+          filter: blur(0);
+          opacity: 1;
+        }
       }
 
       /* Glitch Effect on Hover */
@@ -1625,15 +1685,27 @@
     </footer>
 
     <script>
-      // Custom Cursor Logic
+      // Custom Cursor Logic with Enhanced Effects
       const cursor = document.getElementById("cursor");
       const hoverElements = document.querySelectorAll(
         ".cursor-hover, a, button, input, textarea",
       );
 
+      let mouseX = 0;
+      let mouseY = 0;
+      let cursorX = 0;
+      let cursorY = 0;
+
       document.addEventListener("mousemove", (e) => {
-        cursor.style.left = e.clientX + "px";
-        cursor.style.top = e.clientY + "px";
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        // Smooth cursor following
+        cursorX += (mouseX - cursorX) * 0.15;
+        cursorY += (mouseY - cursorY) * 0.15;
+
+        cursor.style.left = cursorX + "px";
+        cursor.style.top = cursorY + "px";
         cursor.style.transform = `translate(-50%, -50%)`;
       });
 
@@ -1642,16 +1714,21 @@
         el.addEventListener("mouseenter", () => {
           cursor.style.width = "60px";
           cursor.style.height = "60px";
-          cursor.style.backgroundColor = "#FBFF48"; // Neo Yellow
-          cursor.style.mixBlendMode = "normal";
-          cursor.style.border = "2px solid black";
+          cursor.style.backgroundColor = "#121212"; // Neo Black (inverted)
+          cursor.style.mixBlendMode = "difference";
+          cursor.style.border = "3px solid white";
+          cursor.style.boxShadow =
+            "0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 0.3)";
+          cursor.classList.add("active");
         });
         el.addEventListener("mouseleave", () => {
           cursor.style.width = "24px";
           cursor.style.height = "24px";
-          cursor.style.backgroundColor = "#fff";
+          cursor.style.backgroundColor = "#000";
           cursor.style.mixBlendMode = "difference";
-          cursor.style.border = "none";
+          cursor.style.border = "2px solid rgba(255, 255, 255, 0.5)";
+          cursor.style.boxShadow = "0 0 20px rgba(0, 0, 0, 0.6)";
+          cursor.classList.remove("active");
         });
       });
 
@@ -1694,57 +1771,19 @@
       // Call on page load
       fetchGitHubStats();
 
-      // LinkedIn API Integration
-      async function fetchLinkedInStats() {
-        try {
-          // Using LinkedIn API via RapidAPI or similar service
-          // For now, using a public endpoint that doesn't require auth
-          const profileUrl = "https://www.linkedin.com/in/anmol1992";
+      // LinkedIn Stats (Static values - for OAuth implementation, set up server-side auth)
+      function initLinkedInStats() {
+        const linkedInConnections = document.getElementById(
+          "linkedin-connections",
+        );
+        const linkedInFollowers = document.getElementById("linkedin-followers");
 
-          // Fetch using LinkedIn Public Profile API (requires CORS workaround)
-          // Using alternative: fetch profile via external API service
-          const response = await fetch("https://api.linkedin.com/v2/me", {
-            headers: {
-              Authorization: "Bearer YOUR_ACCESS_TOKEN",
-            },
-          }).catch(() => {
-            // Fallback: Use a public profile scraping service
-            return fetch(`https://www.linkedin.com/in/anmol1992`, {
-              headers: {
-                Accept: "application/json",
-              },
-            }).catch(() => null);
-          });
-
-          // For a real implementation, you would:
-          // 1. Set up OAuth with LinkedIn
-          // 2. Use LinkedIn API to fetch profile data
-          // 3. Display real-time connection and follower counts
-
-          // Temporary static values (replace with API data)
-          const linkedInConnections = document.getElementById(
-            "linkedin-connections",
-          );
-          const linkedInFollowers =
-            document.getElementById("linkedin-followers");
-
-          if (linkedInConnections) linkedInConnections.textContent = "500+";
-          if (linkedInFollowers) linkedInFollowers.textContent = "150+";
-        } catch (error) {
-          console.error("Error fetching LinkedIn stats:", error);
-          const linkedInConnections = document.getElementById(
-            "linkedin-connections",
-          );
-          const linkedInFollowers =
-            document.getElementById("linkedin-followers");
-
-          if (linkedInConnections) linkedInConnections.textContent = "N/A";
-          if (linkedInFollowers) linkedInFollowers.textContent = "N/A";
-        }
+        if (linkedInConnections) linkedInConnections.textContent = "500+";
+        if (linkedInFollowers) linkedInFollowers.textContent = "150+";
       }
 
       // Call on page load
-      fetchLinkedInStats();
+      initLinkedInStats();
 
       // Scroll Reveal Logic
       const revealElements = document.querySelectorAll(".reveal");
