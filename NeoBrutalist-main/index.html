@@ -236,12 +236,292 @@
           transform: translate(0);
         }
       }
+
+      /* Loading Screen Styles */
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #fffdf5 0%, #f5f5f0 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 0.8s ease-out;
+        overflow: hidden;
+      }
+
+      .loading-screen::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background:
+          radial-gradient(
+            circle at 20% 50%,
+            rgba(51, 255, 87, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 80%,
+            rgba(59, 130, 246, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 40% 20%,
+            rgba(255, 112, 166, 0.1) 0%,
+            transparent 50%
+          );
+        animation: gradientShift 8s ease-in-out infinite;
+      }
+
+      @keyframes gradientShift {
+        0%,
+        100% {
+          transform: translate(0, 0);
+        }
+        50% {
+          transform: translate(10%, 10%);
+        }
+      }
+
+      .loading-screen.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .loading-content {
+        text-align: center;
+        position: relative;
+        z-index: 10;
+      }
+
+      .loading-container {
+        margin-bottom: 50px;
+      }
+
+      .loading-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 30px;
+        position: relative;
+      }
+
+      .loading-icon-ring {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border: 3px solid #121212;
+        border-radius: 50%;
+        animation: spinRing 2s linear infinite;
+      }
+
+      .loading-icon-ring:nth-child(2) {
+        width: 70%;
+        height: 70%;
+        top: 15%;
+        left: 15%;
+        border-color: #33ff57;
+        animation: spinRing 3s linear infinite reverse;
+      }
+
+      .loading-icon-ring:nth-child(3) {
+        width: 50%;
+        height: 50%;
+        top: 25%;
+        left: 25%;
+        border-color: #ff70a6;
+        animation: spinRing 4s linear infinite;
+      }
+
+      .loading-icon-center {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background-color: #121212;
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      }
+
+      @keyframes spinRing {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .loading-text {
+        font-size: 3.5vw;
+        font-weight: 900;
+        letter-spacing: 3px;
+        margin-bottom: 20px;
+        font-family: "Space Grotesk", sans-serif;
+        background: linear-gradient(
+          90deg,
+          #121212 0%,
+          #33ff57 50%,
+          #3b82f6 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: textGlow 2s ease-in-out infinite;
+      }
+
+      @keyframes textGlow {
+        0%,
+        100% {
+          filter: drop-shadow(0 0 5px rgba(51, 255, 87, 0.3));
+          transform: scale(1);
+        }
+        50% {
+          filter: drop-shadow(0 0 15px rgba(51, 255, 87, 0.6));
+          transform: scale(1.02);
+        }
+      }
+
+      .loading-bar {
+        width: 280px;
+        height: 6px;
+        background-color: #e5e5e5;
+        border: 2px solid #121212;
+        position: relative;
+        overflow: hidden;
+        margin: 0 auto;
+        box-shadow: 4px 4px 0px 0px #000;
+      }
+
+      .loading-bar::after {
+        content: "";
+        position: absolute;
+        height: 100%;
+        background: linear-gradient(90deg, #33ff57, #3b82f6, #ff70a6);
+        width: 0%;
+        animation: loadingProgress 3s ease-in-out forwards;
+        box-shadow: 0 0 10px rgba(51, 255, 87, 0.8);
+      }
+
+      .loading-status {
+        margin-top: 20px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.9rem;
+        color: #121212;
+        letter-spacing: 1px;
+        font-weight: 600;
+        opacity: 0.7;
+        animation: statusBlink 1.5s ease-in-out infinite;
+      }
+
+      @keyframes statusBlink {
+        0%,
+        100% {
+          opacity: 0.5;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes loadingPulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.7;
+          transform: scale(0.98);
+        }
+      }
+
+      @keyframes loadingProgress {
+        0% {
+          width: 0%;
+        }
+        100% {
+          width: 100%;
+        }
+      }
+
+      .loading-dots {
+        display: inline-block;
+        margin-left: 8px;
+      }
+
+      .loading-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background: linear-gradient(135deg, #33ff57, #3b82f6);
+        border-radius: 50%;
+        margin: 0 5px;
+        animation: dotBounce 1.5s ease-in-out infinite;
+        box-shadow: 0 0 10px rgba(51, 255, 87, 0.5);
+      }
+
+      .loading-dot:nth-child(1) {
+        animation-delay: 0s;
+      }
+
+      .loading-dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .loading-dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes dotBounce {
+        0%,
+        100% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+        50% {
+          transform: translateY(-15px);
+          opacity: 0.6;
+        }
+      }
     </style>
   </head>
 
   <body
     class="text-neo-black font-display antialiased selection:bg-neo-black selection:text-neo-yellow"
   >
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+      <div class="loading-content">
+        <div class="loading-icon">
+          <div class="loading-icon-ring"></div>
+          <div class="loading-icon-ring"></div>
+          <div class="loading-icon-ring"></div>
+          <div class="loading-icon-center"></div>
+        </div>
+        <div class="loading-text">
+          ANMOL.exe
+          <div class="loading-dots">
+            <span class="loading-dot"></span>
+            <span class="loading-dot"></span>
+            <span class="loading-dot"></span>
+          </div>
+        </div>
+        <div class="loading-bar-container">
+          <div class="loading-bar"></div>
+          <p class="loading-status">INITIALIZING SYSTEM...</p>
+        </div>
+      </div>
+    </div>
+
     <div
       id="cursor"
       class="w-6 h-6 bg-white rounded-full border-2 border-black hidden lg:block"
@@ -1073,20 +1353,13 @@
             class="reveal group bg-white border-4 border-black p-0 shadow-hard overflow-hidden hover:shadow-hard-lg transition-all"
           >
             <div
-              class="bg-black border-b-4 border-black aspect-video relative overflow-hidden flex items-center justify-center group-hover:brightness-125 transition-all duration-300"
+              class="border-b-4 border-black aspect-video relative overflow-hidden group-hover:brightness-125 transition-all duration-300"
             >
-              <div class="text-center px-4">
-                <div
-                  class="text-white font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-2 md:mb-4 leading-tight"
-                >
-                  PDF_TOOLS
-                </div>
-                <p
-                  class="text-neo-yellow font-mono text-xs sm:text-sm md:text-lg font-bold"
-                >
-                  CONVERT • MERGE • TRANSFORM
-                </p>
-              </div>
+              <img
+                src="pdf-tool.png"
+                alt="PDF Tools Suite"
+                class="w-full h-full object-cover"
+              />
             </div>
             <div class="p-6">
               <div class="flex justify-between items-start gap-4">
@@ -1161,15 +1434,13 @@
             class="reveal group bg-white border-4 border-black p-4 shadow-hard mt-0 md:mt-20 overflow-hidden"
           >
             <div
-              class="bg-black aspect-video relative overflow-hidden flex items-center justify-center group-hover:brightness-125 transition-all duration-300"
+              class="aspect-video relative overflow-hidden group-hover:brightness-125 transition-all duration-300"
             >
-              <div class="text-center px-4">
-                <div
-                  class="text-white font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight"
-                >
-                  JARVIS_AI
-                </div>
-              </div>
+              <img
+                src="jarvis.png"
+                alt="Local Jarvis"
+                class="w-full h-full object-cover"
+              />
             </div>
             <div class="flex justify-between items-start gap-4">
               <div class="flex-1">
@@ -1224,15 +1495,13 @@
             class="reveal group bg-white border-4 border-black p-4 shadow-hard overflow-hidden"
           >
             <div
-              class="bg-black aspect-video relative overflow-hidden flex items-center justify-center group-hover:brightness-125 transition-all duration-300"
+              class="aspect-video relative overflow-hidden group-hover:brightness-125 transition-all duration-300"
             >
-              <div class="text-center px-4">
-                <div
-                  class="text-white font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight"
-                >
-                  WHATSAPP_BOT
-                </div>
-              </div>
+              <img
+                src="automation.png"
+                alt="WhatsApp Automation"
+                class="w-full h-full object-cover"
+              />
             </div>
             <div class="flex justify-between items-start gap-4">
               <div class="flex-1">
@@ -1285,15 +1554,13 @@
             class="reveal group bg-white border-4 border-black p-4 shadow-hard mt-0 md:mt-20 overflow-hidden"
           >
             <div
-              class="bg-black aspect-video relative overflow-hidden flex items-center justify-center group-hover:brightness-125 transition-all duration-300"
+              class="aspect-video relative overflow-hidden group-hover:brightness-125 transition-all duration-300"
             >
-              <div class="text-center px-4">
-                <div
-                  class="text-white font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight"
-                >
-                  GAME_ENGINE
-                </div>
-              </div>
+              <img
+                src="engine.png"
+                alt="C++ Game Engine"
+                class="w-full h-full object-cover"
+              />
             </div>
             <div class="flex justify-between items-start gap-4">
               <div class="flex-1">
@@ -1347,15 +1614,13 @@
             class="reveal group bg-white border-4 border-black p-4 shadow-hard overflow-hidden"
           >
             <div
-              class="bg-black aspect-video relative overflow-hidden flex items-center justify-center group-hover:brightness-125 transition-all duration-300"
+              class="aspect-video relative overflow-hidden group-hover:brightness-125 transition-all duration-300"
             >
-              <div class="text-center px-4">
-                <div
-                  class="text-white font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight"
-                >
-                  DATA_PROC
-                </div>
-              </div>
+              <img
+                src="data.png"
+                alt="Data Processing App"
+                class="w-full h-full object-cover"
+              />
             </div>
             <div class="flex justify-between items-start gap-4">
               <div class="flex-1">
@@ -1423,15 +1688,13 @@
             class="reveal group bg-white border-4 border-black p-4 shadow-hard mt-0 md:mt-20 overflow-hidden"
           >
             <div
-              class="bg-black aspect-video relative overflow-hidden flex items-center justify-center group-hover:brightness-125 transition-all duration-300"
+              class="aspect-video relative overflow-hidden group-hover:brightness-125 transition-all duration-300"
             >
-              <div class="text-center px-4">
-                <div
-                  class="text-white font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight"
-                >
-                  CRICKET_AI
-                </div>
-              </div>
+              <img
+                src="cricket.png"
+                alt="Cricket Match Analyzer"
+                class="w-full h-full object-cover"
+              />
             </div>
             <div class="flex justify-between items-start gap-4">
               <div class="flex-1">
@@ -1685,6 +1948,14 @@
     </footer>
 
     <script>
+      // Loading Screen Logic
+      window.addEventListener("load", function () {
+        const loadingScreen = document.getElementById("loadingScreen");
+        setTimeout(() => {
+          loadingScreen.classList.add("hidden");
+        }, 3000);
+      });
+
       // Custom Cursor Logic with Enhanced Effects
       const cursor = document.getElementById("cursor");
       const hoverElements = document.querySelectorAll(
