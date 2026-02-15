@@ -244,7 +244,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: #121212;
+        background-color: #fffdf5;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -259,24 +259,36 @@
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          90deg,
-          transparent 0%,
-          rgba(51, 255, 87, 0.1) 50%,
-          transparent 100%
-        );
-        animation: scanlines 3s ease-in-out infinite;
+        right: 0;
+        bottom: 0;
+        background-image:
+          radial-gradient(#000 1px, transparent 1px),
+          linear-gradient(to right, #e5e5e5 1px, transparent 1px),
+          linear-gradient(to bottom, #e5e5e5 1px, transparent 1px);
+        background-size:
+          40px 40px,
+          100px 100px,
+          100px 100px;
+        opacity: 0.5;
       }
 
-      @keyframes scanlines {
-        0% {
-          transform: translateX(-100%);
-        }
-        100% {
-          transform: translateX(100%);
-        }
+      .loading-screen::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, 
+          transparent 30%, 
+          rgba(51, 255, 87, 0.05) 50%, 
+          transparent 70%);
+        animation: shimmerLoad 3s ease-in-out infinite;
+      }
+
+      @keyframes shimmerLoad {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
       }
 
       .loading-screen.hidden {
@@ -285,26 +297,86 @@
       }
 
       .loading-content {
+        text-align: center;
         position: relative;
         z-index: 10;
-        text-align: center;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 50px;
+        gap: 40px;
       }
 
-      .loading-spinner {
-        width: 120px;
-        height: 120px;
-        border: 3px solid #33ff57;
-        border-top-color: transparent;
-        border-right-color: transparent;
+      .loading-box {
+        border: 3px solid #121212;
+        padding: 60px 80px;
+        background-color: #fff;
+        box-shadow: 8px 8px 0px 0px #000;
+        animation: boxPulse 2s ease-in-out infinite;
+      }
+
+      @keyframes boxPulse {
+        0%, 100% {
+          transform: scale(1);
+          box-shadow: 8px 8px 0px 0px #000;
+        }
+        50% {
+          transform: scale(1.02);
+          box-shadow: 10px 10px 0px 0px #000;
+        }
+      }
+
+      .loading-icon {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 20px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .loading-icon-ring {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border: 4px solid transparent;
+        border-top-color: #121212;
+        border-right-color: #33ff57;
         border-radius: 50%;
-        animation: spin 1.5s linear infinite;
+        animation: spinRing 2s linear infinite;
       }
 
-      @keyframes spin {
+      .loading-icon-ring:nth-child(2) {
+        width: 75%;
+        height: 75%;
+        top: 12.5%;
+        left: 12.5%;
+        border-top-color: #3b82f6;
+        border-right-color: #ff70a6;
+        animation: spinRing 2.5s linear infinite reverse;
+      }
+
+      .loading-icon-ring:nth-child(3) {
+        width: 50%;
+        height: 50%;
+        top: 25%;
+        left: 25%;
+        border-top-color: #ff70a6;
+        border-right-color: #121212;
+        animation: spinRing 3s linear infinite;
+      }
+
+      .loading-icon-center {
+        width: 24px;
+        height: 24px;
+        background-color: #121212;
+        border-radius: 2px;
+        position: relative;
+        z-index: 5;
+        box-shadow: 0 0 15px rgba(51, 255, 87, 0.6);
+      }
+
+      @keyframes spinRing {
         0% {
           transform: rotate(0deg);
         }
@@ -314,27 +386,30 @@
       }
 
       .loading-text-main {
-        font-size: 3.5vw;
+        font-size: 4.5vw;
         font-weight: 900;
-        letter-spacing: 3px;
+        letter-spacing: 2px;
         font-family: "Space Grotesk", sans-serif;
-        color: #33ff57;
+        color: #121212;
         margin: 0;
-        text-transform: uppercase;
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: 12px;
       }
 
-      .loading-dots {
+      .loading-text-main .loading-dots {
         display: flex;
-        gap: 10px;
+        gap: 8px;
+        margin-left: 12px;
       }
 
       .loading-dot {
-        width: 8px;
-        height: 8px;
-        background-color: #33ff57;
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        background-color: #121212;
+        border: 2px solid #33ff57;
+        box-sizing: border-box;
         animation: dotBounce 1.5s ease-in-out infinite;
       }
 
@@ -352,31 +427,44 @@
 
       @keyframes dotBounce {
         0%, 100% {
-          opacity: 0.4;
           transform: translateY(0);
         }
         50% {
-          opacity: 1;
-          transform: translateY(-8px);
+          transform: translateY(-12px);
         }
       }
 
+      .loading-bar-section {
+        width: 100%;
+      }
+
+      .loading-status {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.85rem;
+        color: #121212;
+        letter-spacing: 2px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        text-transform: uppercase;
+      }
+
       .loading-bar {
-        width: 300px;
-        height: 4px;
-        background-color: rgba(51, 255, 87, 0.2);
+        width: 320px;
+        height: 8px;
+        background-color: #e5e5e5;
+        border: 2px solid #121212;
         position: relative;
         overflow: hidden;
+        box-shadow: 4px 4px 0px 0px #000;
       }
 
       .loading-bar::after {
         content: "";
         position: absolute;
         height: 100%;
-        background-color: #33ff57;
+        background: linear-gradient(90deg, #121212 0%, #33ff57 50%, #3b82f6 100%);
         width: 0%;
         animation: loadingProgress 3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        box-shadow: 0 0 20px #33ff57;
       }
 
       @keyframes loadingProgress {
@@ -387,7 +475,15 @@
           width: 100%;
         }
       }
-    </style>
+
+      .loading-percentage {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.8rem;
+        color: #121212;
+        font-weight: 600;
+        margin-top: 12px;
+        letter-spacing: 1px;
+      }
     </style>
     </style>
   </head>
@@ -398,16 +494,27 @@
     <!-- Loading Screen -->
     <div id="loadingScreen" class="loading-screen">
       <div class="loading-content">
-        <div class="loading-spinner"></div>
-        <div class="loading-text-main">
-          ANMOL
-          <div class="loading-dots">
-            <span class="loading-dot"></span>
-            <span class="loading-dot"></span>
-            <span class="loading-dot"></span>
+        <div class="loading-box">
+          <div class="loading-icon">
+            <div class="loading-icon-ring"></div>
+            <div class="loading-icon-ring"></div>
+            <div class="loading-icon-ring"></div>
+            <div class="loading-icon-center"></div>
+          </div>
+          <div class="loading-text-main">
+            ANMOL.exe
+            <div class="loading-dots">
+              <span class="loading-dot"></span>
+              <span class="loading-dot"></span>
+              <span class="loading-dot"></span>
+            </div>
           </div>
         </div>
-        <div class="loading-bar"></div>
+        <div class="loading-bar-section">
+          <p class="loading-status">LOADING PORTFOLIO</p>
+          <div class="loading-bar"></div>
+          <p class="loading-percentage">100%</p>
+        </div>
       </div>
     </div>
 
