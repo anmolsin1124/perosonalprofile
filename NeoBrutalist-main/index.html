@@ -237,253 +237,51 @@
         }
       }
 
-      /* Loading Screen Styles */
-      .loading-screen {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #fffdf5;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        opacity: 1;
-        transition: opacity 0.8s ease-out;
-        overflow: hidden;
+      /* Skill card flip */
+      .skill-card {
+        perspective: 900px;
       }
 
-      .loading-screen::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-image:
-          radial-gradient(#000 1px, transparent 1px),
-          linear-gradient(to right, #e5e5e5 1px, transparent 1px),
-          linear-gradient(to bottom, #e5e5e5 1px, transparent 1px);
-        background-size:
-          40px 40px,
-          100px 100px,
-          100px 100px;
-        opacity: 0.5;
-      }
-
-      .loading-screen::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(45deg, 
-          transparent 30%, 
-          rgba(51, 255, 87, 0.05) 50%, 
-          transparent 70%);
-        animation: shimmerLoad 3s ease-in-out infinite;
-      }
-
-      @keyframes shimmerLoad {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
-      }
-
-      .loading-screen.hidden {
-        opacity: 0;
-        pointer-events: none;
-      }
-
-      .loading-content {
-        text-align: center;
+      .skill-card .skill-inner {
         position: relative;
-        z-index: 10;
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+        transition: transform 0.6s ease;
+      }
+
+      .skill-card:hover .skill-inner {
+        transform: rotateY(180deg);
+      }
+
+      .skill-face {
+        position: absolute;
+        inset: 0;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 40px;
-      }
-
-      .loading-box {
-        border: 3px solid #121212;
-        padding: 60px 80px;
-        background-color: #fff;
-        box-shadow: 8px 8px 0px 0px #000;
-        animation: boxPulse 2s ease-in-out infinite;
-      }
-
-      @keyframes boxPulse {
-        0%, 100% {
-          transform: scale(1);
-          box-shadow: 8px 8px 0px 0px #000;
-        }
-        50% {
-          transform: scale(1.02);
-          box-shadow: 10px 10px 0px 0px #000;
-        }
-      }
-
-      .loading-icon {
-        width: 100px;
-        height: 100px;
-        margin: 0 auto 20px;
-        position: relative;
-        display: flex;
-        align-items: center;
         justify-content: center;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        backface-visibility: hidden;
+        border-radius: 4px;
+        box-shadow: 4px 4px 0 rgba(0, 0, 0, 1);
       }
 
-      .loading-icon-ring {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        border: 4px solid transparent;
-        border-top-color: #121212;
-        border-right-color: #33ff57;
-        border-radius: 50%;
-        animation: spinRing 2s linear infinite;
+      .skill-front {
+        background: #121212;
       }
 
-      .loading-icon-ring:nth-child(2) {
-        width: 75%;
-        height: 75%;
-        top: 12.5%;
-        left: 12.5%;
-        border-top-color: #3b82f6;
-        border-right-color: #ff70a6;
-        animation: spinRing 2.5s linear infinite reverse;
+      .skill-back {
+        background: #33ff57;
+        color: #0b0b0b;
+        transform: rotateY(180deg);
+        box-shadow: 6px 6px 0 rgba(0, 0, 0, 1);
       }
 
-      .loading-icon-ring:nth-child(3) {
-        width: 50%;
-        height: 50%;
-        top: 25%;
-        left: 25%;
-        border-top-color: #ff70a6;
-        border-right-color: #121212;
-        animation: spinRing 3s linear infinite;
+      .skill-card.auto-flip .skill-inner {
+        transform: rotateY(180deg);
       }
 
-      .loading-icon-center {
-        width: 24px;
-        height: 24px;
-        background-color: #121212;
-        border-radius: 2px;
-        position: relative;
-        z-index: 5;
-        box-shadow: 0 0 15px rgba(51, 255, 87, 0.6);
-      }
-
-      @keyframes spinRing {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-
-      .loading-text-main {
-        font-size: 4.5vw;
-        font-weight: 900;
-        letter-spacing: 2px;
-        font-family: "Space Grotesk", sans-serif;
-        color: #121212;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .loading-text-main .loading-dots {
-        display: flex;
-        gap: 8px;
-        margin-left: 12px;
-      }
-
-      .loading-dot {
-        display: inline-block;
-        width: 12px;
-        height: 12px;
-        background-color: #121212;
-        border: 2px solid #33ff57;
-        box-sizing: border-box;
-        animation: dotBounce 1.5s ease-in-out infinite;
-      }
-
-      .loading-dot:nth-child(1) {
-        animation-delay: 0s;
-      }
-
-      .loading-dot:nth-child(2) {
-        animation-delay: 0.2s;
-      }
-
-      .loading-dot:nth-child(3) {
-        animation-delay: 0.4s;
-      }
-
-      @keyframes dotBounce {
-        0%, 100% {
-          transform: translateY(0);
-        }
-        50% {
-          transform: translateY(-12px);
-        }
-      }
-
-      .loading-bar-section {
-        width: 100%;
-      }
-
-      .loading-status {
-        font-family: "JetBrains Mono", monospace;
-        font-size: 0.85rem;
-        color: #121212;
-        letter-spacing: 2px;
-        font-weight: 700;
-        margin-bottom: 16px;
-        text-transform: uppercase;
-      }
-
-      .loading-bar {
-        width: 320px;
-        height: 8px;
-        background-color: #e5e5e5;
-        border: 2px solid #121212;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 4px 4px 0px 0px #000;
-      }
-
-      .loading-bar::after {
-        content: "";
-        position: absolute;
-        height: 100%;
-        background: linear-gradient(90deg, #121212 0%, #33ff57 50%, #3b82f6 100%);
-        width: 0%;
-        animation: loadingProgress 3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-      }
-
-      @keyframes loadingProgress {
-        0% {
-          width: 0%;
-        }
-        100% {
-          width: 100%;
-        }
-      }
-
-      .loading-percentage {
-        font-family: "JetBrains Mono", monospace;
-        font-size: 0.8rem;
-        color: #121212;
-        font-weight: 600;
-        margin-top: 12px;
-        letter-spacing: 1px;
-      }
     </style>
     </style>
   </head>
@@ -1812,6 +1610,25 @@
         if (linkedInFollowers) linkedInFollowers.textContent = "150+";
       }
 
+      // trigger skill flip on first reveal
+      const skillsSection = document.getElementById('skills');
+      let lastSkillFlip = 0;
+      const skillsObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const now = Date.now();
+              if (now - lastSkillFlip > 1200) {
+                lastSkillFlip = now;
+                triggerSkillFlip();
+              }
+            }
+          });
+        },
+        { threshold: 0.3 },
+      );
+      if (skillsSection) skillsObserver.observe(skillsSection);
+
       // tilt interaction for GitHub card
       function initTilt() {
         const card = document.querySelector('.github-card');
@@ -1862,21 +1679,55 @@
         if (!container) return;
         skills.forEach((s) => {
           const card = document.createElement('div');
-          card.className = 'group w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/6 xl:w-[12.5%] h-24 border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-green transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center p-2';
-          let inner = `
-            <div class="text-neo-green group-hover:text-black font-mono text-xs mb-1 opacity-50">&gt;_ ${s.cat}</div>
+          card.className = 'skill-card group w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/6 xl:w-[12.5%] h-28 border-r-2 border-b-2 border-white/20 transition-all duration-300 hover:z-10 relative cursor-hover p-2';
+          const isGithub = s.name.toLowerCase() === 'github';
+          const palette = skillPalette(s.name);
+          card.innerHTML = `
+            <div class="skill-inner">
+              <div class="skill-face skill-front">
+                <div class="text-neo-green font-mono text-[10px] md:text-xs mb-1 opacity-70">&gt;_ ${s.cat}</div>
+                ${isGithub
+                  ? '<i class="ri-github-fill text-2xl text-white"></i>'
+                  : `<div class="text-white font-black font-display text-xl uppercase">${s.name}</div>`}
+              </div>
+              <div class="skill-face skill-back" style="background:${palette.back};color:${palette.text};">
+                <div class="font-mono text-[10px] uppercase tracking-wide">${s.cat}</div>
+                <div class="font-black font-display text-xl uppercase">${s.name}</div>
+                <div class="font-mono text-[10px] opacity-70">Swipe to deploy</div>
+              </div>
+            </div>
           `;
-          if (s.name.toLowerCase() === 'github') {
-            inner += `
-              <i class="ri-github-fill text-2xl text-white group-hover:text-black"></i>
-            `;
-          } else {
-            inner += `
-              <div class="text-white group-hover:text-black font-black font-display text-xl uppercase">${s.name}</div>
-            `;
-          }
-          card.innerHTML = inner;
           container.appendChild(card);
+        });
+      }
+
+      // choose a palette per skill name (applied on flip side only)
+      function skillPalette(name) {
+        const key = name.toLowerCase();
+        if (key.includes('python')) return { back: '#ff9f1c', text: '#0b0b0b' };
+        if (key.includes('javascript')) return { back: '#fbff48', text: '#0b0b0b' };
+        if (key.includes('typescript')) return { back: '#2563eb', text: '#ffffff' };
+        if (key.includes('react')) return { back: '#3b82f6', text: '#0b0b0b' };
+        if (key.includes('next')) return { back: '#0f172a', text: '#ffffff' };
+        if (key.includes('node') || key.includes('express')) return { back: '#16a34a', text: '#0b0b0b' };
+        if (key.includes('mongo')) return { back: '#22c55e', text: '#0b0b0b' };
+        if (key.includes('mysql')) return { back: '#1d4ed8', text: '#ffffff' };
+        if (key.includes('c++')) return { back: '#60a5fa', text: '#0b0b0b' };
+        if (key.includes('git')) return { back: '#0b0b0b', text: '#ffffff' };
+        if (key.includes('tailwind')) return { back: '#38bdf8', text: '#0b0b0b' };
+        if (key.includes('html') || key.includes('css')) return { back: '#f97316', text: '#0b0b0b' };
+        if (key.includes('ai') || key.includes('ml') || key.includes('data')) return { back: '#a855f7', text: '#0b0b0b' };
+        return { back: '#33ff57', text: '#0b0b0b' };
+      }
+
+      // sequential flip when skills come into view
+      function triggerSkillFlip() {
+        const cards = document.querySelectorAll('.skill-card');
+        cards.forEach((card, idx) => {
+          setTimeout(() => {
+            card.classList.add('auto-flip');
+            setTimeout(() => card.classList.remove('auto-flip'), 900);
+          }, idx * 120);
         });
       }
 
