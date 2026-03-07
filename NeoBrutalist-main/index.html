@@ -948,13 +948,19 @@
                   <p
                     class="text-[8px] font-mono text-neo-green/50 uppercase tracking-[0.2em] mb-1"
                   >
-                    Matrix_Output
+                    Matrix_Output — <span id="contrib-year"></span>
                   </p>
-                  <img
-                    src="https://ghchart.rshah.org/33FF57/anmolsin1124"
-                    alt="GitHub Contribution Graph"
-                    class="w-full h-auto filter brightness-110"
-                  />
+                  <div
+                    id="gh-contrib-calendar"
+                    class="w-full overflow-x-auto"
+                    style="min-height: 90px"
+                  >
+                    <p
+                      class="text-[9px] font-mono text-neo-green/40 animate-pulse"
+                    >
+                      Loading contributions…
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -1862,8 +1868,125 @@
         }
       }
 
+      // ── GitHub Contribution Calendar (current year only) ──
+      async function renderContribCalendar() {
+        const currentYear = new Date().getFullYear();
+        const yearEl = document.getElementById("contrib-year");
+        const calEl = document.getElementById("gh-contrib-calendar");
+        if (yearEl) yearEl.textContent = currentYear;
+        if (!calEl) return;
+
+        try {
+          const res = await fetch(
+            `https://github-contributions-api.jogruber.de/v4/anmolsin1124?y=${currentYear}`,
+          );
+          if (!res.ok) throw new Error(res.status);
+          const data = await res.json();
+
+          // Build a map: 'YYYY-MM-DD' → level (0-4)
+          const contribs = {};
+          (data.contributions || []).forEach((arr) => {
+            arr.forEach((d) => {
+              contribs[d.date] = d.level;
+            });
+          });
+
+          // Determine weeks for Jan 1 → Dec 31 of current year
+          const jan1 = new Date(currentYear, 0, 1);
+          const dec31 = new Date(currentYear, 11, 31);
+          const startDay = jan1.getDay(); // 0=Sun
+
+          // colours matching neo-green theme
+          const colours = [
+            "#161b22", // level 0 – empty
+            "#0e4429", // level 1
+            "#006d32", // level 2
+            "#26a641", // level 3
+            "#33FF57", // level 4 – max (neo-green)
+          ];
+
+          // Month labels
+          const monthNames = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+
+          // Collect all cells by week-column
+          const weeks = [];
+          let cursor = new Date(jan1);
+          cursor.setDate(cursor.getDate() - startDay); // back to Sunday of week 0
+
+          while (cursor <= dec31 || cursor.getDay() !== 0) {
+            const week = [];
+            for (let d = 0; d < 7; d++) {
+              const iso = cursor.toISOString().slice(0, 10);
+              const inYear = cursor.getFullYear() === currentYear;
+              week.push({
+                date: iso,
+                level: inYear ? (contribs[iso] ?? 0) : -1,
+              });
+              cursor.setDate(cursor.getDate() + 1);
+            }
+            weeks.push(week);
+            if (cursor > dec31 && cursor.getDay() === 0) break;
+          }
+
+          const cellSize = 10;
+          const gap = 2;
+          const step = cellSize + gap;
+          const svgW = weeks.length * step + 30; // +30 for month labels
+          const svgH = 7 * step + 18; // +18 for month header
+
+          let svg = `<svg width="${svgW}" height="${svgH}" xmlns="http://www.w3.org/2000/svg" style="font-family:'JetBrains Mono',monospace;">`;
+
+          // Month labels across the top
+          let prevMonth = -1;
+          weeks.forEach((week, wi) => {
+            const firstInYear = week.find((c) => c.level >= 0);
+            if (firstInYear) {
+              const m = parseInt(firstInYear.date.split("-")[1], 10) - 1;
+              if (m !== prevMonth) {
+                const x = wi * step;
+                svg += `<text x="${x}" y="10" fill="#33FF57" font-size="8" opacity="0.6">${monthNames[m]}</text>`;
+                prevMonth = m;
+              }
+            }
+          });
+
+          // Grid of cells
+          weeks.forEach((week, wi) => {
+            week.forEach((cell, di) => {
+              if (cell.level < 0) return; // outside current year
+              const x = wi * step;
+              const y = di * step + 16;
+              const fill = colours[cell.level] || colours[0];
+              svg += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="2" fill="${fill}"><title>${cell.date}: level ${cell.level}</title></rect>`;
+            });
+          });
+
+          svg += "</svg>";
+          calEl.innerHTML = svg;
+        } catch (err) {
+          console.error("Contribution calendar error:", err);
+          // Fallback to ghchart image (full history)
+          calEl.innerHTML =
+            '<img src="https://ghchart.rshah.org/33FF57/anmolsin1124" alt="GitHub Contribution Graph" class="w-full h-auto filter brightness-110" />';
+        }
+      }
+
       // Call on page load
       fetchGitHubStats();
+      renderContribCalendar();
       initTilt();
       addExtraSkills();
 
