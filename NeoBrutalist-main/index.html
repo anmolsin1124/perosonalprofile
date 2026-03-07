@@ -1811,8 +1811,13 @@
 
       // Event delegation for cursor hover — single listener pair on document
       // instead of attaching listeners to every interactive element
+      const CURSOR_HOVER_SELECTOR = ".cursor-hover, a, button, input, textarea";
       function isCursorHoverTarget(el) {
-        return el && el.closest(".cursor-hover, a, button, input, textarea");
+        return (
+          el &&
+          (el.matches(CURSOR_HOVER_SELECTOR) ||
+            el.closest(CURSOR_HOVER_SELECTOR))
+        );
       }
 
       document.addEventListener("mouseover", (e) => {
