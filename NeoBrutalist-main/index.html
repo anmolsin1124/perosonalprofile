@@ -1921,6 +1921,14 @@
             "Dec",
           ];
 
+          // Local date → 'YYYY-MM-DD' (avoids UTC timezone shift)
+          function toLocalISO(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, "0");
+            const d = String(date.getDate()).padStart(2, "0");
+            return `${y}-${m}-${d}`;
+          }
+
           // Collect all cells by week-column
           const weeks = [];
           let cursor = new Date(jan1);
@@ -1929,7 +1937,7 @@
           while (cursor <= dec31 || cursor.getDay() !== 0) {
             const week = [];
             for (let d = 0; d < 7; d++) {
-              const iso = cursor.toISOString().slice(0, 10);
+              const iso = toLocalISO(cursor);
               const inYear = cursor.getFullYear() === currentYear;
               week.push({
                 date: iso,
@@ -1949,17 +1957,30 @@
 
           let svg = `<svg width="${svgW}" height="${svgH}" xmlns="http://www.w3.org/2000/svg" style="font-family:'JetBrains Mono',monospace;">`;
 
-          // Month labels across the top
+          // Month labels across the top — label the week that contains the 1st of a month
           let prevMonth = -1;
           weeks.forEach((week, wi) => {
-            const firstInYear = week.find((c) => c.level >= 0);
-            if (firstInYear) {
-              const m = parseInt(firstInYear.date.split("-")[1], 10) - 1;
-              if (m !== prevMonth) {
-                const x = wi * step;
-                svg += `<text x="${x}" y="10" fill="#33FF57" font-size="8" opacity="0.6">${monthNames[m]}</text>`;
-                prevMonth = m;
-              }
+            // Find a day in this week that is the first day of a month (local date)
+            const firstOfMonth = week.find((c) => {
+              if (c.level < 0) return false;
+              const day = parseInt(c.date.split("-")[2], 10);
+              return day === 1;
+            });
+
+            // Fallback: for the very first visible week, if there's any day in-year, label its month (ensures Jan shows)
+            let labelMonth = null;
+            if (firstOfMonth) {
+              labelMonth = parseInt(firstOfMonth.date.split("-")[1], 10) - 1;
+            } else if (wi === 0) {
+              const anyInYear = week.find((c) => c.level >= 0);
+              if (anyInYear)
+                labelMonth = parseInt(anyInYear.date.split("-")[1], 10) - 1;
+            }
+
+            if (labelMonth !== null && labelMonth !== prevMonth) {
+              const x = wi * step;
+              svg += `<text x="${x}" y="10" fill="#33FF57" font-size="8" opacity="0.6">${monthNames[labelMonth]}</text>`;
+              prevMonth = labelMonth;
             }
           });
 
@@ -1976,6 +1997,27 @@
 
           svg += "</svg>";
           calEl.innerHTML = svg;
+
+          // Auto-scroll to the week containing today's date so current-month contributions are visible
+          try {
+            const todayISO = toLocalISO(new Date());
+            const weekIndex = weeks.findIndex((w) =>
+              w.some((c) => c.date === todayISO),
+            );
+            if (weekIndex >= 0) {
+              // center the found week in the visible area when possible
+              const targetX = Math.max(
+                0,
+                weekIndex * step - calEl.clientWidth / 2,
+              );
+              calEl.scrollTo({ left: targetX, behavior: "smooth" });
+            } else {
+              // fallback: scroll to end (most recent weeks)
+              calEl.scrollTo({ left: calEl.scrollWidth, behavior: "smooth" });
+            }
+          } catch (e) {
+            // ignore scroll errors
+          }
         } catch (err) {
           console.error("Contribution calendar error:", err);
           // Fallback to ghchart image (full history)
