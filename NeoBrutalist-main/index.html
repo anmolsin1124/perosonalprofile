@@ -34,9 +34,15 @@
     <title>ANMOL | Data Science & AI</title>
 
     <meta name="theme-color" content="#121212" />
+    <link rel="icon" type="image/png" href="title_icon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+
     <link
       rel="preload"
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Space+Grotesk:wght@800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap"
       as="style"
     />
 
@@ -47,9 +53,6 @@
       rel="stylesheet"
     />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="icon" type="image/png" href="title_icon.png" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
@@ -703,6 +706,7 @@
             <img
               src="img.jpg"
               alt="Anmol Singh"
+              loading="lazy"
               class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
             />
             <span
@@ -797,7 +801,7 @@
         <div
           class="border-t-4 border-white mt-8 pt-4 flex justify-between font-mono text-xs text-gray-500"
         >
-          <span>TOTAL_NODES: 22</span>
+          <span>TOTAL_NODES: 24</span>
           <span>SYSTEM: READY</span>
         </div>
       </div>
@@ -953,6 +957,7 @@
                   <img
                     src="https://ghchart.rshah.org/33FF57/anmolsin1124"
                     alt="GitHub Contribution Graph"
+                    loading="lazy"
                     class="w-full h-auto filter brightness-110"
                   />
                 </div>
@@ -1020,6 +1025,7 @@
                   <img
                     src="https://leetcard.jacoblin.cool/j8qsnmkp8x?theme=dark&font=Ubuntu&ext=heatmap"
                     alt="LeetCode Stats"
+                    loading="lazy"
                     class="w-full h-auto object-contain filter contrast-125"
                   />
                 </div>
@@ -1175,6 +1181,7 @@
               <img
                 src="pdf-tool.png"
                 alt="PDF Tools Suite"
+                loading="lazy"
                 class="w-full h-full object-cover"
               />
             </div>
@@ -1256,6 +1263,7 @@
               <img
                 src="jarvis.png"
                 alt="Local Jarvis"
+                loading="lazy"
                 class="w-full h-full object-cover"
               />
             </div>
@@ -1317,6 +1325,7 @@
               <img
                 src="automation.png"
                 alt="WhatsApp Automation"
+                loading="lazy"
                 class="w-full h-full object-cover"
               />
             </div>
@@ -1376,6 +1385,7 @@
               <img
                 src="engine.png"
                 alt="C++ Game Engine"
+                loading="lazy"
                 class="w-full h-full object-cover"
               />
             </div>
@@ -1436,6 +1446,7 @@
               <img
                 src="data.png"
                 alt="Data Processing App"
+                loading="lazy"
                 class="w-full h-full object-cover"
               />
             </div>
@@ -1510,6 +1521,7 @@
               <img
                 src="cricket.png"
                 alt="Cricket Match Analyzer"
+                loading="lazy"
                 class="w-full h-full object-cover"
               />
             </div>
@@ -1777,9 +1789,6 @@
 
       // Custom Cursor Logic with Enhanced Effects
       const cursor = document.getElementById("cursor");
-      const hoverElements = document.querySelectorAll(
-        ".cursor-hover, a, button, input, textarea",
-      );
 
       let mouseX = 0;
       let mouseY = 0;
@@ -1800,19 +1809,29 @@
       }
       requestAnimationFrame(updateCursor);
 
-      // Add hover effect to cursor
-      hoverElements.forEach((el) => {
-        el.addEventListener("mouseenter", () => {
+      // Event delegation for cursor hover — single listener pair on document
+      // instead of attaching listeners to every interactive element
+      function isCursorHoverTarget(el) {
+        return el && el.closest(".cursor-hover, a, button, input, textarea");
+      }
+
+      document.addEventListener("mouseover", (e) => {
+        if (isCursorHoverTarget(e.target)) {
           cursor.style.width = "60px";
           cursor.style.height = "60px";
-          cursor.style.backgroundColor = "#121212"; // Neo Black (inverted)
+          cursor.style.backgroundColor = "#121212";
           cursor.style.mixBlendMode = "difference";
           cursor.style.border = "3px solid white";
           cursor.style.boxShadow =
             "0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 0.3)";
           cursor.classList.add("active");
-        });
-        el.addEventListener("mouseleave", () => {
+        }
+      });
+      document.addEventListener("mouseout", (e) => {
+        if (
+          isCursorHoverTarget(e.target) &&
+          !isCursorHoverTarget(e.relatedTarget)
+        ) {
           cursor.style.width = "24px";
           cursor.style.height = "24px";
           cursor.style.backgroundColor = "#000";
@@ -1820,7 +1839,7 @@
           cursor.style.border = "2px solid rgba(255, 255, 255, 0.5)";
           cursor.style.boxShadow = "0 0 20px rgba(0, 0, 0, 0.6)";
           cursor.classList.remove("active");
-        });
+        }
       });
 
       // helper: animate numeric counters
@@ -1950,11 +1969,12 @@
           { cat: "MEDIA", name: "Video" },
           { cat: "LANGUAGE", name: "TypeScript" },
           { cat: "FRONTEND", name: "Next.js" },
-          { cat: "BACKEND", name: "Express.js" },
           { cat: "LIB", name: "Tailwind" },
         ];
         const container = document.getElementById("skills-container");
         if (!container) return;
+        // Batch DOM insertions with DocumentFragment to avoid per-card reflow
+        const fragment = document.createDocumentFragment();
         skills.forEach((s) => {
           const card = document.createElement("div");
           card.className =
@@ -1978,38 +1998,42 @@
               </div>
             </div>
           `;
-          container.appendChild(card);
+          fragment.appendChild(card);
         });
+        container.appendChild(fragment);
       }
 
-      // choose a palette per skill name — real brand / theme colors
+      // O(1) object lookup for skill palette instead of sequential if-chain
+      const SKILL_PALETTES = {
+        "c++": { back: "#00599C", text: "#ffffff" },
+        "python": { back: "#3776AB", text: "#FFD43B" },
+        "data sci": { back: "#7C3AED", text: "#ffffff" },
+        "dsa": { back: "#EF4444", text: "#ffffff" },
+        "javascript": { back: "#F7DF1E", text: "#000000" },
+        "html/css": { back: "#E44D26", text: "#ffffff" },
+        "react": { back: "#61DAFB", text: "#20232A" },
+        "node.js": { back: "#339933", text: "#ffffff" },
+        "express.js": { back: "#000000", text: "#ffffff" },
+        "mysql": { back: "#4479A1", text: "#ffffff" },
+        "mongodb": { back: "#47A248", text: "#ffffff" },
+        "linux": { back: "#FCC624", text: "#000000" },
+        "git": { back: "#F05032", text: "#ffffff" },
+        "github": { back: "#181717", text: "#ffffff" },
+        "json": { back: "#292929", text: "#F7DF1E" },
+        "script": { back: "#14B8A6", text: "#ffffff" },
+        "auto": { back: "#FF9F1C", text: "#000000" },
+        "ai/ml": { back: "#8B5CF6", text: "#ffffff" },
+        "graphic": { back: "#FF70A6", text: "#000000" },
+        "ui/ux": { back: "#EC4899", text: "#ffffff" },
+        "video": { back: "#DC2626", text: "#ffffff" },
+        "typescript": { back: "#3178C6", text: "#ffffff" },
+        "next.js": { back: "#000000", text: "#ffffff" },
+        "tailwind": { back: "#06B6D4", text: "#ffffff" },
+      };
+      const DEFAULT_PALETTE = { back: "#33ff57", text: "#0b0b0b" };
+
       function skillPalette(name) {
-        const key = name.toLowerCase();
-        if (key === "c++") return { back: "#00599C", text: "#ffffff" }; // C++ official blue
-        if (key === "python") return { back: "#3776AB", text: "#FFD43B" }; // Python blue + yellow text
-        if (key === "data sci") return { back: "#7C3AED", text: "#ffffff" }; // deep purple
-        if (key === "dsa") return { back: "#EF4444", text: "#ffffff" }; // algorithm red
-        if (key === "javascript") return { back: "#F7DF1E", text: "#000000" }; // JS yellow
-        if (key === "html/css") return { back: "#E44D26", text: "#ffffff" }; // HTML orange
-        if (key === "react") return { back: "#61DAFB", text: "#20232A" }; // React cyan
-        if (key === "node.js") return { back: "#339933", text: "#ffffff" }; // Node green
-        if (key === "express.js") return { back: "#000000", text: "#ffffff" }; // Express dark
-        if (key === "mysql") return { back: "#4479A1", text: "#ffffff" }; // MySQL blue
-        if (key === "mongodb") return { back: "#47A248", text: "#ffffff" }; // Mongo green
-        if (key === "linux") return { back: "#FCC624", text: "#000000" }; // Tux yellow
-        if (key === "git") return { back: "#F05032", text: "#ffffff" }; // Git orange-red
-        if (key === "github") return { back: "#181717", text: "#ffffff" }; // GitHub dark
-        if (key === "json") return { back: "#292929", text: "#F7DF1E" }; // dark + yellow accent
-        if (key === "script") return { back: "#14B8A6", text: "#ffffff" }; // teal
-        if (key === "auto") return { back: "#FF9F1C", text: "#000000" }; // automation orange
-        if (key === "ai/ml") return { back: "#8B5CF6", text: "#ffffff" }; // violet
-        if (key === "graphic") return { back: "#FF70A6", text: "#000000" }; // neo-pink
-        if (key === "ui/ux") return { back: "#EC4899", text: "#ffffff" }; // hot pink
-        if (key === "video") return { back: "#DC2626", text: "#ffffff" }; // video red
-        if (key === "typescript") return { back: "#3178C6", text: "#ffffff" }; // TS blue
-        if (key === "next.js") return { back: "#000000", text: "#ffffff" }; // Next black
-        if (key === "tailwind") return { back: "#06B6D4", text: "#ffffff" }; // Tailwind cyan
-        return { back: "#33ff57", text: "#0b0b0b" };
+        return SKILL_PALETTES[name.toLowerCase()] || DEFAULT_PALETTE;
       }
 
       // sequential flip — 'forward' = first→last, 'reverse' = last→first
@@ -2117,6 +2141,7 @@
       }
 
       // Scroll Progress Bar — debounced via rAF for smoothness
+      const progressBar = document.getElementById("progressBar");
       let ticking = false;
       window.addEventListener("scroll", function () {
         if (!ticking) {
@@ -2127,12 +2152,12 @@
               document.documentElement.scrollHeight -
               document.documentElement.clientHeight;
             const scrolled = (winScroll / height) * 100;
-            document.getElementById("progressBar").style.width = scrolled + "%";
+            progressBar.style.width = scrolled + "%";
             ticking = false;
           });
           ticking = true;
         }
-      });
+      }, { passive: true });
     </script>
   </body>
 </html>
