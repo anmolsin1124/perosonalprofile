@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en" class="scroll-smooth">
   <head>
@@ -940,26 +941,38 @@
 
               <div class="flex-1 flex flex-col justify-center mb-8">
                 <div
-                  class="bg-black border-2 border-neo-green/30 p-2 overflow-hidden shadow-[4px_4px_0_rgba(51,255,87,0.1)] group hover:border-neo-green transition-colors duration-500 relative"
+                  class="bg-[#0d1117] border border-[#30363d] rounded-md p-4 overflow-hidden relative"
                 >
-                  <div
-                    class="absolute top-1 right-1 w-1.5 h-1.5 bg-neo-green rounded-full animate-pulse"
-                  ></div>
-                  <p
-                    class="text-[8px] font-mono text-neo-green/50 uppercase tracking-[0.2em] mb-1"
-                  >
-                    Matrix_Output — <span id="contrib-year"></span>
-                  </p>
-                  <div
-                    id="gh-contrib-calendar"
-                    class="w-full overflow-x-auto"
-                    style="min-height: 90px"
-                  >
-                    <p
-                      class="text-[9px] font-mono text-neo-green/40 animate-pulse"
-                    >
+                  <!-- Total contributions header -->
+                  <div class="flex items-center justify-between mb-3">
+                    <p id="contrib-total" class="text-[13px] text-[#8b949e]">
                       Loading contributions…
                     </p>
+                    <span id="contrib-year" class="hidden"></span>
+                  </div>
+
+                  <!-- Contribution grid -->
+                  <div
+                    id="gh-contrib-calendar"
+                    class="w-full overflow-x-auto pb-1"
+                    style="min-height: 100px"
+                  >
+                    <p
+                      class="text-[9px] font-mono text-[#8b949e] animate-pulse"
+                    >
+                      Loading…
+                    </p>
+                  </div>
+
+                  <!-- Footer link -->
+                  <div class="mt-2 pt-2 border-t border-[#21262d]">
+                    <a
+                      href="https://github.com/anmolsin1124"
+                      target="_blank"
+                      class="text-[11px] text-[#58a6ff] hover:underline"
+                    >
+                      Learn how we count contributions
+                    </a>
                   </div>
                 </div>
               </div>
@@ -1868,44 +1881,49 @@
         }
       }
 
-      // ── GitHub Contribution Calendar (current year only) ──
+      // ── GitHub Contribution Calendar (last 12 months — matches GitHub profile) ──
       async function renderContribCalendar() {
-        const currentYear = new Date().getFullYear();
         const yearEl = document.getElementById("contrib-year");
         const calEl = document.getElementById("gh-contrib-calendar");
-        if (yearEl) yearEl.textContent = currentYear;
+        const totalEl = document.getElementById("contrib-total");
         if (!calEl) return;
 
         try {
+          // Fetch trailing 12-month window (same as GitHub profile)
           const res = await fetch(
-            `https://github-contributions-api.jogruber.de/v4/anmolsin1124?y=${currentYear}`,
+            "https://github-contributions-api.jogruber.de/v4/anmolsin1124?y=last",
           );
           if (!res.ok) throw new Error(res.status);
           const data = await res.json();
 
-          // Build a map: 'YYYY-MM-DD' → level (0-4)
+          // Build a map: 'YYYY-MM-DD' → { level, count }
           const contribs = {};
-          (data.contributions || []).forEach((arr) => {
-            arr.forEach((d) => {
-              contribs[d.date] = d.level;
-            });
+          (data.contributions || []).forEach((d) => {
+            contribs[d.date] = { level: d.level, count: d.count };
           });
 
-          // Determine weeks for Jan 1 → Dec 31 of current year
-          const jan1 = new Date(currentYear, 0, 1);
-          const dec31 = new Date(currentYear, 11, 31);
-          const startDay = jan1.getDay(); // 0=Sun
+          // Total contributions in the last year
+          const totalContribs = Object.values(data.total || {})[0] || 0;
+          if (totalEl)
+            totalEl.textContent = `${totalContribs} contributions in the last year`;
 
-          // colours matching neo-green theme
+          // Date range: from ~1 year ago to today
+          const today = new Date();
+          const startDate = new Date(today);
+          startDate.setFullYear(startDate.getFullYear() - 1);
+          startDate.setDate(startDate.getDate() + 1);
+
+          if (yearEl) yearEl.textContent = today.getFullYear();
+
+          // GitHub-style level colours (dark theme)
           const colours = [
-            "#161b22", // level 0 – empty
+            "#161b22", // level 0
             "#0e4429", // level 1
             "#006d32", // level 2
             "#26a641", // level 3
-            "#33FF57", // level 4 – max (neo-green)
+            "#39d353", // level 4
           ];
 
-          // Month labels
           const monthNames = [
             "Jan",
             "Feb",
@@ -1921,7 +1939,6 @@
             "Dec",
           ];
 
-          // Local date → 'YYYY-MM-DD' (avoids UTC timezone shift)
           function toLocalISO(date) {
             const y = date.getFullYear();
             const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -1929,98 +1946,102 @@
             return `${y}-${m}-${d}`;
           }
 
-          // Collect all cells by week-column
+          // Collect all cells by week-column (Sun-start weeks)
           const weeks = [];
-          let cursor = new Date(jan1);
-          cursor.setDate(cursor.getDate() - startDay); // back to Sunday of week 0
+          let cursor = new Date(startDate);
+          cursor.setDate(cursor.getDate() - cursor.getDay());
 
-          while (cursor <= dec31 || cursor.getDay() !== 0) {
+          while (cursor <= today) {
             const week = [];
             for (let d = 0; d < 7; d++) {
               const iso = toLocalISO(cursor);
-              const inYear = cursor.getFullYear() === currentYear;
+              const inRange = cursor >= startDate && cursor <= today;
+              const info = contribs[iso];
               week.push({
                 date: iso,
-                level: inYear ? (contribs[iso] ?? 0) : -1,
+                level: inRange ? (info ? info.level : 0) : -1,
+                count: inRange ? (info ? info.count : 0) : 0,
               });
               cursor.setDate(cursor.getDate() + 1);
             }
             weeks.push(week);
-            if (cursor > dec31 && cursor.getDay() === 0) break;
           }
 
-          const cellSize = 10;
-          const gap = 2;
+          // Layout constants
+          const cellSize = 11;
+          const gap = 3;
           const step = cellSize + gap;
-          const svgW = weeks.length * step + 30; // +30 for month labels
-          const svgH = 7 * step + 18; // +18 for month header
+          const leftPad = 32; // space for day labels (Mon, Wed, Fri)
+          const topPad = 20; // space for month labels
+          const svgW = leftPad + weeks.length * step + 10;
+          const svgH = topPad + 7 * step + 8;
+          const legendX = svgW - 120;
+          const legendY = svgH - 2;
 
-          let svg = `<svg width="${svgW}" height="${svgH}" xmlns="http://www.w3.org/2000/svg" style="font-family:'JetBrains Mono',monospace;">`;
+          let svg = `<svg width="${svgW}" height="${svgH}" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI','Helvetica',sans-serif;">`;
 
-          // Month labels across the top — label the week that contains the 1st of a month
+          // ── Month labels across the top ──
           let prevMonth = -1;
           weeks.forEach((week, wi) => {
-            // Find a day in this week that is the first day of a month (local date)
             const firstOfMonth = week.find((c) => {
               if (c.level < 0) return false;
-              const day = parseInt(c.date.split("-")[2], 10);
-              return day === 1;
+              return parseInt(c.date.split("-")[2], 10) <= 7;
             });
 
-            // Fallback: for the very first visible week, if there's any day in-year, label its month (ensures Jan shows)
             let labelMonth = null;
-            if (firstOfMonth) {
+            if (firstOfMonth)
               labelMonth = parseInt(firstOfMonth.date.split("-")[1], 10) - 1;
-            } else if (wi === 0) {
-              const anyInYear = week.find((c) => c.level >= 0);
-              if (anyInYear)
-                labelMonth = parseInt(anyInYear.date.split("-")[1], 10) - 1;
+            if (wi === 0 && labelMonth === null) {
+              const any = week.find((c) => c.level >= 0);
+              if (any) labelMonth = parseInt(any.date.split("-")[1], 10) - 1;
             }
 
             if (labelMonth !== null && labelMonth !== prevMonth) {
-              const x = wi * step;
-              svg += `<text x="${x}" y="10" fill="#33FF57" font-size="8" opacity="0.6">${monthNames[labelMonth]}</text>`;
+              const x = leftPad + wi * step;
+              svg += `<text x="${x}" y="12" fill="#8b949e" font-size="10">${monthNames[labelMonth]}</text>`;
               prevMonth = labelMonth;
             }
           });
 
-          // Grid of cells
+          // ── Day labels on the left (Mon, Wed, Fri) ──
+          const dayLabels = { 1: "Mon", 3: "Wed", 5: "Fri" };
+          Object.entries(dayLabels).forEach(([di, label]) => {
+            const y = topPad + parseInt(di) * step + cellSize - 2;
+            svg += `<text x="0" y="${y}" fill="#8b949e" font-size="9">${label}</text>`;
+          });
+
+          // ── Grid of contribution cells ──
           weeks.forEach((week, wi) => {
             week.forEach((cell, di) => {
-              if (cell.level < 0) return; // outside current year
-              const x = wi * step;
-              const y = di * step + 16;
+              if (cell.level < 0) return;
+              const x = leftPad + wi * step;
+              const y = topPad + di * step;
               const fill = colours[cell.level] || colours[0];
-              svg += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="2" fill="${fill}"><title>${cell.date}: level ${cell.level}</title></rect>`;
+              const stroke = cell.level === 0 ? "rgba(27,31,35,0.06)" : "none";
+              svg += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="2" ry="2" fill="${fill}" stroke="${stroke}" stroke-width="1"><title>${cell.date}: ${cell.count} contribution${cell.count !== 1 ? "s" : ""}</title></rect>`;
             });
           });
+
+          // ── Legend: Less □□□□□ More ──
+          const legendColors = colours;
+          const legendCellSize = 10;
+          const legendGap = 3;
+          svg += `<text x="${legendX}" y="${legendY}" fill="#8b949e" font-size="9">Less</text>`;
+          legendColors.forEach((c, i) => {
+            const lx = legendX + 28 + i * (legendCellSize + legendGap);
+            svg += `<rect x="${lx}" y="${legendY - 9}" width="${legendCellSize}" height="${legendCellSize}" rx="2" fill="${c}" stroke="rgba(27,31,35,0.06)" stroke-width="1"/>`;
+          });
+          svg += `<text x="${legendX + 28 + legendColors.length * (legendCellSize + legendGap) + 4}" y="${legendY}" fill="#8b949e" font-size="9">More</text>`;
 
           svg += "</svg>";
           calEl.innerHTML = svg;
 
-          // Auto-scroll to the week containing today's date so current-month contributions are visible
+          // Auto-scroll to show the most recent weeks
           try {
-            const todayISO = toLocalISO(new Date());
-            const weekIndex = weeks.findIndex((w) =>
-              w.some((c) => c.date === todayISO),
-            );
-            if (weekIndex >= 0) {
-              // center the found week in the visible area when possible
-              const targetX = Math.max(
-                0,
-                weekIndex * step - calEl.clientWidth / 2,
-              );
-              calEl.scrollTo({ left: targetX, behavior: "smooth" });
-            } else {
-              // fallback: scroll to end (most recent weeks)
-              calEl.scrollTo({ left: calEl.scrollWidth, behavior: "smooth" });
-            }
-          } catch (e) {
-            // ignore scroll errors
-          }
+            calEl.scrollTo({ left: calEl.scrollWidth, behavior: "smooth" });
+          } catch (e) {}
         } catch (err) {
           console.error("Contribution calendar error:", err);
-          // Fallback to ghchart image (full history)
           calEl.innerHTML =
             '<img src="https://ghchart.rshah.org/33FF57/anmolsin1124" alt="GitHub Contribution Graph" class="w-full h-auto filter brightness-110" />';
         }
