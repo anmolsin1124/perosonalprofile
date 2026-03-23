@@ -482,6 +482,8 @@
       .photo-shine {
         position: relative;
         overflow: hidden;
+        animation: floatGentle 5s ease-in-out infinite;
+        will-change: transform;
       }
 
       .photo-shine::after {
@@ -1049,6 +1051,7 @@
                     class="absolute top-1 right-1 w-1.5 h-1.5 bg-neo-orange rounded-full animate-pulse"
                   ></div>
                   <img
+                    id="leetcode-card"
                     src="https://leetcard.jacoblin.cool/j8qsnmkp8x?theme=dark&font=Ubuntu&ext=heatmap"
                     alt="LeetCode Stats"
                     class="w-full h-auto object-contain filter contrast-125"
@@ -2030,11 +2033,44 @@
         }
       }
 
+      // Safe fallback for LeetCode stats card
+      function initLeetCodeCardFallback() {
+        const img = document.getElementById("leetcode-card");
+        if (!img) return;
+
+        img.addEventListener("error", () => {
+          const wrapper = img.parentElement;
+          if (!wrapper) return;
+
+          const fallback = document.createElement("div");
+          fallback.className =
+            "w-full h-full flex flex-col items-start justify-center gap-2 text-left";
+          fallback.innerHTML = `
+            <p class="font-mono text-xs text-neo-orange/70 uppercase tracking-[0.2em]">
+              LeetCode stats unavailable
+            </p>
+            <p class="font-mono text-sm text-gray-200">
+              The external LeetCode card couldn't be loaded.
+            </p>
+            <a
+              href="https://leetcode.com/u/j8qsnmkp8x/"
+              target="_blank"
+              class="inline-flex items-center gap-1 text-neo-orange font-mono text-xs underline underline-offset-2"
+            >
+              Open profile on LeetCode
+              <span class="text-[10px]">↗</span>
+            </a>
+          `;
+
+          wrapper.replaceChild(fallback, img);
+        });
+      }
+
       // Call on page load
       fetchGitHubStats();
       renderContribCalendar();
-      initTilt();
       addExtraSkills();
+      initLeetCodeCardFallback();
 
       // LinkedIn Stats (Static values - for OAuth implementation, set up server-side auth)
       function initLinkedInStats() {
@@ -2076,23 +2112,6 @@
       );
       if (skillsSection) skillsObserver.observe(skillsSection);
 
-      // tilt interaction for GitHub card
-      function initTilt() {
-        const card = document.querySelector(".github-card");
-        if (!card) return;
-        card.addEventListener("mousemove", (e) => {
-          const rect = card.getBoundingClientRect();
-          const x = e.clientX - rect.left - rect.width / 2;
-          const y = e.clientY - rect.top - rect.height / 2;
-          const rotX = (y / rect.height) * -15;
-          const rotY = (x / rect.width) * 15;
-          card.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-        });
-        card.addEventListener("mouseleave", () => {
-          card.style.transform = "perspective(800px) rotateX(0) rotateY(0)";
-        });
-      }
-
       // dynamically append extra skills defined in a JSON array
       function addExtraSkills() {
         const skills = [
@@ -2119,7 +2138,6 @@
           { cat: "MEDIA", name: "Video" },
           { cat: "LANGUAGE", name: "TypeScript" },
           { cat: "FRONTEND", name: "Next.js" },
-          { cat: "BACKEND", name: "Express.js" },
           { cat: "LIB", name: "Tailwind" },
         ];
         const container = document.getElementById("skills-container");
