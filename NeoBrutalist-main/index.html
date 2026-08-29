@@ -167,6 +167,72 @@
         }
       }
 
+      #axis-cursor {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 2147483647;
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+      }
+
+      #axis-cursor.visible {
+        opacity: 1;
+      }
+
+      #axis-cursor .crosshair-v,
+      #axis-cursor .crosshair-h {
+        position: absolute;
+        pointer-events: none;
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.35);
+      }
+
+      #axis-cursor .crosshair-v {
+        left: 0;
+        top: 0;
+        width: 1px;
+        height: 100vh;
+        transform: translateX(-50%);
+      }
+
+      #axis-cursor .crosshair-h {
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 1px;
+        transform: translateY(-50%);
+      }
+
+      #axis-cursor .crosshair-dot {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 9999px;
+        background: #19fa2f;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 0 12px rgba(25, 250, 47, 0.8);
+        pointer-events: none;
+      }
+
+      #axis-cursor .crosshair-label {
+        position: absolute;
+        transform: translate(12px, 12px);
+        pointer-events: none;
+        line-height: 1;
+        color: #000000;
+        background: #ffffff;
+        padding: 4px 6px;
+        border-radius: 1px;
+        white-space: nowrap;
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 400;
+        font-size: 12px;
+        letter-spacing: 0em;
+        text-align: left;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+      }
+
       /* Animations */
       .marquee-container {
         overflow: hidden;
@@ -537,6 +603,13 @@
   <body
     class="text-neo-black font-display antialiased selection:bg-neo-black selection:text-neo-yellow"
   >
+    <div id="axis-cursor" aria-hidden="true">
+      <div class="crosshair-v"></div>
+      <div class="crosshair-h"></div>
+      <div class="crosshair-dot"></div>
+      <div class="crosshair-label">X: 0 Y: 0</div>
+    </div>
+
     <div
       id="cursor"
       class="w-6 h-6 bg-white rounded-full border-2 border-black hidden lg:block"
@@ -1872,6 +1945,93 @@
     </footer>
 
     <script>
+      // Plain JS version of the React crosshair cursor feature.
+      const axisCursor = document.getElementById("axis-cursor");
+      const axisVertical = axisCursor.querySelector(".crosshair-v");
+      const axisHorizontal = axisCursor.querySelector(".crosshair-h");
+      const axisDot = axisCursor.querySelector(".crosshair-dot");
+      const axisLabel = axisCursor.querySelector(".crosshair-label");
+
+      const axisConfig = {
+        verticalColor: "#ffffff",
+        verticalThickness: 1,
+        horizontalColor: "#ffffff",
+        horizontalThickness: 1,
+        dotColor: "#19fa2f",
+        dotSize: 12,
+        showPosition: true,
+        labelColor: "#000000",
+        labelBg: "#ffffff",
+        labelPaddingX: 6,
+        labelPaddingY: 4,
+        labelRadius: 1,
+      };
+
+      const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+
+      function applyAxisStyles() {
+        axisVertical.style.background = axisConfig.verticalColor;
+        axisVertical.style.width = `${axisConfig.verticalThickness}px`;
+        axisVertical.style.height = `${window.innerHeight}px`;
+
+        axisHorizontal.style.background = axisConfig.horizontalColor;
+        axisHorizontal.style.height = `${axisConfig.horizontalThickness}px`;
+        axisHorizontal.style.width = `${window.innerWidth}px`;
+
+        axisDot.style.background = axisConfig.dotColor;
+        axisDot.style.width = `${axisConfig.dotSize}px`;
+        axisDot.style.height = `${axisConfig.dotSize}px`;
+
+        axisLabel.style.color = axisConfig.labelColor;
+        axisLabel.style.background = axisConfig.labelBg;
+        axisLabel.style.padding = `${axisConfig.labelPaddingY}px ${axisConfig.labelPaddingX}px`;
+        axisLabel.style.borderRadius = `${axisConfig.labelRadius}px`;
+      }
+
+      function updateAxisCursor(clientX, clientY) {
+        if (isTouchDevice || !axisCursor) return;
+
+        axisVertical.style.left = `${clientX}px`;
+        axisHorizontal.style.top = `${clientY}px`;
+        axisDot.style.left = `${clientX}px`;
+        axisDot.style.top = `${clientY}px`;
+
+        axisLabel.style.left = `${clientX + 12}px`;
+        axisLabel.style.top = `${clientY + 12}px`;
+
+        if (axisConfig.showPosition) {
+          axisLabel.textContent = `X: ${Math.round(clientX)}  Y: ${Math.round(clientY)}`;
+          axisLabel.style.display = "block";
+        } else {
+          axisLabel.style.display = "none";
+        }
+      }
+
+      function showAxisCursor() {
+        if (!isTouchDevice && axisCursor) {
+          axisCursor.classList.add("visible");
+        }
+      }
+
+      function hideAxisCursor() {
+        if (axisCursor) {
+          axisCursor.classList.remove("visible");
+        }
+      }
+
+      applyAxisStyles();
+
+      if (!isTouchDevice) {
+        window.addEventListener("pointermove", (event) => {
+          updateAxisCursor(event.clientX, event.clientY);
+          showAxisCursor();
+        });
+
+        window.addEventListener("pointerleave", hideAxisCursor);
+        document.addEventListener("mouseleave", hideAxisCursor);
+        window.addEventListener("resize", applyAxisStyles);
+      }
+
       // Custom Cursor Logic with Enhanced Effects
       const cursor = document.getElementById("cursor");
       const hoverElements = document.querySelectorAll(
